@@ -2,5 +2,10 @@
 #include "CLIApp.h"
 
 int main(int argc, const char** argv) {
-    return makeApp(--argc, ++argv)->run();
+    try {
+        makeApp(--argc, ++argv)->run();
+    } catch (...) {
+        return -1;
+    }
+    return 0;
 }

@@ -23,12 +23,11 @@ public:
     TemlateTask(TemlateTask&&) = delete;
     TemlateTask(const TemlateTask&) = delete;
     TemlateTask(FuncType func, ArgTypes... args)
-      //: m_func{std::bind(func, args...)}
-            : m_func{[func, args...](){func(args...);}}
-    {
-    }
+      : m_func{std::bind(func, std::forward<ArgTypes>(args)...)}
+    {}
 
     std::function<void()> m_func;
+    const std::tuple<ArgTypes...> m_args;
     void operator()() override
     {
         m_func();
@@ -47,7 +46,14 @@ public:
     template <typename FuncType, typename... ArgTypes>
     void run(FuncType f, ArgTypes... args)
     {
-        submitTask(new TemlateTask(f, std::forward<ArgTypes...>(args...)));
+        auto lock = std::unique_lock{m_mtx};
+        m_cv.wait(lock, [this] { return !m_free_workers.empty(); });
+
+        auto free_it = m_free_workers.begin();
+        auto [busy_it, _] = m_busy_workers.emplace(*free_it);
+        m_free_workers.erase(free_it);
+        auto task = new TemlateTask(f, std::forward<ArgTypes>(args)...);
+        (*busy_it)->setTask(std::unique_ptr<ITask>(task));
     }
 
 private:
@@ -70,12 +76,13 @@ private:
         std::condition_variable m_cv;
         std::mutex m_worker_mtx;
         ThreadPool& m_owner;
+
+        void work();
     };
 
     friend class Worker;
 
     using WorkerPtr = std::shared_ptr<ThreadPool::Worker>;
-    void submitTask(ITask* task);
     void taskFinished(Worker& worker);
 
     std::atomic<bool> m_under_destruction;

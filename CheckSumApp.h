@@ -12,7 +12,6 @@
 #include <vector>
 
 #include "IApp.h"
-#include "ByteConsumer.h"
 #include "ByteProducer.h"
 #include "FileReader.h"
 #include "ThreadPool.h"
@@ -50,11 +49,6 @@ protected:
 
 private:
     std::unique_ptr<IByteProducer> m_byte_producer;
-
-    const uint32_t max_queue_size;
-    std::deque<std::vector<uint8_t>> m_queue;
-    std::mutex m_queue_mtx;
-
     std::atomic<uint64_t> m_result{0};
     std::condition_variable m_cv;
 

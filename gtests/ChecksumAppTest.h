@@ -1,0 +1,10 @@
+#ifndef CLIAPP_CHECKSUMAPPTEST_H
+#define CLIAPP_CHECKSUMAPPTEST_H
+
+
+class ChecksumAppTest {
+
+};
+
+
+#endif //CLIAPP_CHECKSUMAPPTEST_H

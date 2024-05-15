@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <cinttypes>
 #include <vector>
-#include "ByteConsumer.h"
 
 class IByteProducer {
 public:

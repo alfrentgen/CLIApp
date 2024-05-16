@@ -32,7 +32,7 @@ uint64_t CheckSumApp::calcCheckSum(const vector<uint8_t>& bytes)
     constexpr uint32_t byte_alignment = 4;
     auto counter = bytes.size() / byte_alignment;
     auto* ptr = reinterpret_cast<const uint32_t*>(bytes.data());
-    auto result = accumulate(ptr, ptr + counter, 0);
+    auto result = accumulate(ptr, ptr + counter, uint64_t{0});
     result += std::accumulate(bytes.begin() + counter * byte_alignment, bytes.end(), 0, [](uint32_t dst, const uint8_t byte) {
         dst <<= 8;
         dst |= byte;

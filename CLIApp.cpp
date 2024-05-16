@@ -1,13 +1,13 @@
 #include <array>
 #include <filesystem>
 #include <iostream>
-#include <map>
 #include <string>
 
 #include "IApp.h"
 #include "ArgParser.h"
 #include "ByteProducer.h"
 #include "CheckSumApp.h"
+#include "WordCountApp.h"
 
 using namespace std;
 using namespace argument_parser;
@@ -43,14 +43,11 @@ std::unique_ptr<IApp> makeApp(int argc, const char** argv)
         Argument{"-v", true, R"(Specifies a word to count. Used in the 'words' mode only. Usage: -m words -v <word>)"}};
 
     using AppMakerFunc = function<std::unique_ptr<IApp>()>;
-
-    std::unique_ptr<ByteProducer> byte_producer;
-    std::array<AppMakerFunc, 3> parser_apps{
-        [&] {
-            auto parser = IArgParser::makeParser({options[0]});
-            parser->parse(argc, argv);
-            return std::unique_ptr<IApp>(new HelpApp("See the application usage below:\n", options));
-        },
+    std::array<AppMakerFunc, 3> parser_apps{[&] {
+                                                auto parser = IArgParser::makeParser({options[0]});
+                                                parser->parse(argc, argv);
+                                                return std::unique_ptr<IApp>(new HelpApp("See the application usage below:\n", options));
+                                            },
         [&] {
             auto parser = IArgParser::makeParser({options[1], options[2]});
             parser->parse(argc, argv);
@@ -59,29 +56,27 @@ std::unique_ptr<IApp> makeApp(int argc, const char** argv)
             if (!file_path || mode != "checksum") {
                 return std::unique_ptr<IApp>{};
             }
-
-            auto* cs_app =
-                new CheckSumApp(std::unique_ptr<IByteProducer>(dynamic_cast<IByteProducer*>(new ByteProducer(file_path.value(), sizeof(int32_t) * 1024))),
-                    std::thread::hardware_concurrency());
-            return std::unique_ptr<IApp>(dynamic_cast<IApp*>(cs_app));
-        } /*,
-         [&]() {
-             auto parser = IArgParser::makeParser({options[1], options[2], options[3]});
-             parser->parse(argc, argv);
-             const auto file_path = (*parser)["-f"];
-             const auto mode = *(*parser)["-m"];
-             const auto word = (*parser)["-v"];
-             if (!file_path || mode != "words" || !word) {
-                 return std::unique_ptr<IApp>{};
-             }
-             return std::unique_ptr<IApp>(new CountWordApp(*file_path, *word));
-         }*/
-    };
+            return std::unique_ptr<IApp>(new CheckSumApp(
+                std::unique_ptr<IByteProducer>(makeFileByteProducer(file_path.value(), sizeof(int32_t) * 1024)), std::thread::hardware_concurrency()));
+        },
+        [&]() {
+            auto parser = IArgParser::makeParser({options[1], options[2], options[3]});
+            parser->parse(argc, argv);
+            const auto file_path = (*parser)["-f"];
+            const auto mode = *(*parser)["-m"];
+            const auto word = (*parser)["-v"];
+            if (!file_path || mode != "words" || !word) {
+                return std::unique_ptr<IApp>{};
+            }
+            return std::unique_ptr<IApp>(
+                new WordCountApp(std::unique_ptr<IByteProducer>(makeFileByteProducer(file_path.value(), sizeof(int32_t) * 1024)), *word));
+            return std::unique_ptr<IApp>{};
+        }};
 
     std::unique_ptr<IApp> app;
     for (auto& app_maker : parser_apps) {
         try {
-            if (app = app_maker())
+            if (app = app_maker(); app)
                 break;
         }
         catch (...) {

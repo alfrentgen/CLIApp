@@ -3,10 +3,8 @@
 
 #include <initializer_list>
 #include <string>
-#include <tuple>
 #include <memory>
 #include <optional>
-#include <vector>
 
 namespace argument_parser {
     class IArgParser;
@@ -16,8 +14,6 @@ namespace argument_parser {
     using ArgKey = std::string;
     using ArgDescription = std::string;
     using ArgValue = std::optional<std::string>;
-
-    constexpr auto unary_arg = false;
 
     struct Argument {
         ArgKey key;

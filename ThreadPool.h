@@ -1,12 +1,14 @@
 #ifndef CLIAPP_THREADPOOL_H
 #define CLIAPP_THREADPOOL_H
 
+#include <atomic>
+#include <condition_variable>
 #include <functional>
-#include <future>
-#include <set>
 #include <mutex>
-#include <optional>
+#include <set>
 #include <thread>
+#include <utility>
+
 
 class ITask
 {

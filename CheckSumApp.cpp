@@ -1,10 +1,11 @@
+#include <algorithm>
 #include <iostream>
-#include <list>
-#include <numeric>
+#include <vector>
 #include <thread>
+#include <utility>
+#include <numeric>
 
 #include "CheckSumApp.h"
-#include "ByteProducer.h"
 
 using namespace std;
 
@@ -15,24 +16,12 @@ CheckSumApp::CheckSumApp(std::unique_ptr<IByteProducer>&& byte_producer, uint32_
 {
 }
 
-ByteProducer::ByteProducer(const std::string& file_path, size_t chunk_size)
-  : m_file_reader{file_path}
-  , m_chunk_size{chunk_size}
-{
-}
-
-bool ByteProducer::produce(std::vector<uint8_t>& destination)
-{
-    destination = m_file_reader.readBytes(m_chunk_size);
-    return m_file_reader.canRead();
-}
-
 uint64_t CheckSumApp::calcCheckSum(const vector<uint8_t>& bytes)
 {
     constexpr uint32_t byte_alignment = 4;
     auto counter = bytes.size() / byte_alignment;
     auto* ptr = reinterpret_cast<const uint32_t*>(bytes.data());
-    auto result = accumulate(ptr, ptr + counter, uint64_t{0});
+    auto result = std::accumulate(ptr, ptr + counter, uint64_t{0});
     result += std::accumulate(bytes.begin() + counter * byte_alignment, bytes.end(), 0, [](uint32_t dst, const uint8_t byte) {
         dst <<= 8;
         dst |= byte;

@@ -1,2 +1,1 @@
-mkdir build && cd build && cmake .. && make
-./CLIApp -h
+mkdir build && cd build && cmake .. && make && ./CLIApp -h

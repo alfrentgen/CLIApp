@@ -9,6 +9,8 @@
 #include "IApp.h"
 #include "ByteProducer.h"
 
+class CharReader;
+
 class WordCountApp : public IApp
 {
 public:
@@ -21,11 +23,11 @@ public:
     int run() override;
 
 protected:
-    virtual uint64_t countWords(const std::vector<uint8_t>& bytes);
+    virtual uint64_t countWord();
 
 private:
-    std::unique_ptr<IByteProducer> m_byte_producer;
     const std::string m_word;
+    std::unique_ptr<CharReader> m_char_reader;
 };
 
-#endif //CLIAPP_WORDCOUNTAPP_H
+#endif // CLIAPP_WORDCOUNTAPP_H

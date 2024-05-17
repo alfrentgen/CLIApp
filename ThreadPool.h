@@ -9,7 +9,6 @@
 #include <thread>
 #include <utility>
 
-
 class ITask
 {
 public:
@@ -26,7 +25,8 @@ public:
     TemlateTask(const TemlateTask&) = delete;
     TemlateTask(FuncType func, ArgTypes... args)
       : m_func{std::bind(func, std::forward<ArgTypes>(args)...)}
-    {}
+    {
+    }
 
     std::function<void()> m_func;
     const std::tuple<ArgTypes...> m_args;

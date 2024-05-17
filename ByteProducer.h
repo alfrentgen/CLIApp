@@ -7,7 +7,8 @@
 #include <vector>
 #include <memory>
 
-class IByteProducer {
+class IByteProducer
+{
 public:
     IByteProducer() = default;
     virtual ~IByteProducer() = default;
@@ -17,4 +18,4 @@ public:
 
 IByteProducer* makeFileByteProducer(const std::string& file_path, size_t chunk_size = 4096);
 
-#endif //CLIAPP_BYTEPRODUCER_H
+#endif // CLIAPP_BYTEPRODUCER_H

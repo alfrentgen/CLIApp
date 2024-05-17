@@ -6,4 +6,4 @@
 
 std::unique_ptr<IApp> makeApp(int argc, const char** argv);
 
-#endif //CLIAPP_H
+#endif // CLIAPP_H

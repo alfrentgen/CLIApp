@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <iostream>
 #include <vector>
 #include <thread>
@@ -7,8 +6,6 @@
 
 #include "CheckSumApp.h"
 
-using namespace std;
-
 CheckSumApp::CheckSumApp(std::unique_ptr<IByteProducer>&& byte_producer, uint32_t max_queue_size)
   : m_byte_producer{std::move(byte_producer)}
   , m_result{0}
@@ -16,7 +13,7 @@ CheckSumApp::CheckSumApp(std::unique_ptr<IByteProducer>&& byte_producer, uint32_
 {
 }
 
-uint64_t CheckSumApp::calcCheckSum(const vector<uint8_t>& bytes)
+uint64_t CheckSumApp::calcCheckSum(const std::vector<uint8_t>& bytes)
 {
     constexpr uint32_t byte_alignment = 4;
     auto counter = bytes.size() / byte_alignment;
@@ -33,10 +30,10 @@ uint64_t CheckSumApp::calcCheckSum(const vector<uint8_t>& bytes)
 int CheckSumApp::run()
 {
     auto update_result = [this](const std::vector<uint8_t>& data) { m_result += calcCheckSum(data); };
-    for (vector<uint8_t> buffer; m_byte_producer->produce(buffer);) {
+    for (std::vector<uint8_t> buffer; m_byte_producer->produce(buffer);) {
         m_thread_pool->run(update_result, std::move(buffer));
     }
     m_thread_pool.reset();
-    cout << "hashsum is: " << m_result << endl;
+    std::cout << "Checksum is: " << m_result << std::endl;
     return 0;
 }

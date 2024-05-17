@@ -4,35 +4,26 @@
 #include <fstream>
 #include <mutex>
 #include <string>
-#include <tuple>
 #include <vector>
+#include <filesystem>
 
 class FileReader
 {
 public:
-    explicit FileReader(const std::string& file_path)
-      : m_file{file_path} {};
+    explicit FileReader(const std::string& file_path);
+
     ~FileReader() = default;
 
-    size_t readBytes(uint8_t* buffer, size_t size)
-    {
-        return m_file.read(reinterpret_cast<char*>(buffer), size).gcount();
-    }
+    size_t readBytes(uint8_t* buffer, size_t size);
 
-    std::vector<uint8_t> readBytes(size_t n_bytes)
-    {
-        std::vector<uint8_t> buffer(n_bytes, 0);
-        buffer.resize(readBytes(buffer.data(), buffer.size()));
-        return buffer;
-    }
+    std::vector<uint8_t> readBytes(size_t n_bytes);
 
-    bool canRead()
-    {
-        return m_file.good();
-    }
+    bool canRead();
 
 private:
     std::ifstream m_file;
+    std::filesystem::path m_path;
+    std::once_flag m_flag;
 };
 
 #endif // CLIAPP_FILEREADER_H

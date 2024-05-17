@@ -79,12 +79,6 @@ uint64_t WordCountApp::countWord()
 
 int WordCountApp::run()
 {
-    try {
-        std::cout << R"(The word ")" + m_word + R"(" occured )" << countWord() << " times.";
-    }
-    catch (...) {
-        auto e = std::current_exception();
-        return -1;
-    }
+    std::cout << R"(The word ")" + m_word + R"(" occured )" << countWord() << " times.";
     return 0;
 }

@@ -53,7 +53,7 @@ IArgParser& CArgParser::parse(int argc, const char** argv)
                 arg_value.value = "";
             }
             else if (next_i == argc) {
-                throw std::runtime_error(std::string("Argument ") + argv[i] + " has no value;");
+                throw std::invalid_argument(std::string("Argument ") + argv[i] + " has no value;");
             }
             else {
                 arg_value.value = argv[next_i];
@@ -62,7 +62,7 @@ IArgParser& CArgParser::parse(int argc, const char** argv)
             arg_value.parsed = true;
         }
     }
-    catch (std::runtime_error& re) {
+    catch (std::invalid_argument& re) {
         throw re;
     }
     catch (...) {
